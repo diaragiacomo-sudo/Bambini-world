@@ -30,6 +30,7 @@ import { MagicButton } from "./components/MagicButton";
 import { MagicChatbot } from "./components/MagicChatbot";
 import { MagicQuiz } from "./components/MagicQuiz";
 import { MagicCanvas } from "./components/MagicCanvas";
+import { MagicPuzzle } from "./components/MagicPuzzle";
 import { Cloud, Star, Rainbow } from "./components/MagicShapes";
 import { cn } from "./lib/utils";
 
@@ -47,16 +48,24 @@ export default function App() {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [loadingStory, setLoadingStory] = useState(false);
   const [generatedStory, setGeneratedStory] = useState("");
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
   const [storyTopic, setStoryTopic] = useState("");
+
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const navigateTo = (section: string) => {
     setActiveSection(section.toLowerCase());
     setIsMenuOpen(false);
+    setSelectedVideo(null); // Reset video on navigation
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const generateStory = async () => {
     setLoadingStory(true);
+    setGeneratedStory("");
+    setGeneratedImage(null);
+    setGeneratedAudio(null);
     try {
       const res = await fetch("/api/generate-story", {
         method: "POST",
@@ -65,6 +74,8 @@ export default function App() {
       });
       const data = await res.json();
       setGeneratedStory(data.story);
+      setGeneratedImage(data.image);
+      setGeneratedAudio(data.audio);
     } catch (err) {
       console.error(err);
     } finally {
@@ -264,9 +275,66 @@ export default function App() {
                   />
                   <MagicButton variant="pink" onClick={generateStory}>{loadingStory ? "Creando..." : "Crea Fiaba!"}</MagicButton>
                 </div>
+
+                {loadingStory && (
+                  <div className="mb-12">
+                    <div className="flex justify-between mb-2 px-2">
+                       <span className="text-brand-pink font-bold text-sm italic">Polvere magica in corso...</span>
+                       <span className="text-brand-pink font-bold text-sm">85%</span>
+                    </div>
+                    <div className="w-full h-4 bg-brand-pink/10 rounded-full overflow-hidden border-2 border-brand-pink/20">
+                       <motion.div 
+                         initial={{ width: "0%" }}
+                         animate={{ width: "100%" }}
+                         transition={{ duration: 3 }}
+                         className="h-full bg-brand-pink"
+                       />
+                    </div>
+                  </div>
+                )}
+
                 {generatedStory && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 bg-brand-pink/5 rounded-3xl text-left border-2 border-dashed border-brand-pink/30 font-medium italic leading-relaxed whitespace-pre-wrap">
-                    {generatedStory}
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    className="space-y-8"
+                  >
+                    {generatedImage && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl"
+                      >
+                        <img 
+                          src={generatedImage} 
+                          alt="Illustrazione Fiaba" 
+                          className="w-full h-auto object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </motion.div>
+                    )}
+
+                    {generatedAudio && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 bg-brand-pink/10 rounded-full flex items-center gap-6 justify-center border-4 border-white shadow-xl"
+                      >
+                        <div className="text-3xl animate-bounce">🎧</div>
+                        <audio 
+                          controls 
+                          src={generatedAudio} 
+                          className="flex-1 h-10 accent-brand-pink" 
+                          autoPlay={isSoundOn}
+                        />
+                      </motion.div>
+                    )}
+
+                    <div className="p-8 md:p-12 bg-white/50 backdrop-blur-sm rounded-[3rem] text-left border-4 border-dashed border-brand-pink/30 shadow-inner">
+                      <div className="text-2xl md:text-3xl font-bold text-slate-800 leading-relaxed whitespace-pre-wrap font-serif decoration-brand-pink underline-offset-8">
+                        {generatedStory}
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </div>
@@ -309,10 +377,22 @@ export default function App() {
                <h2 className="text-5xl font-black text-slate-800">Laboratorio Creativo 🎨</h2>
             </div>
             <div className="grid grid-cols-1 gap-12">
-               <div>
-                 <h3 className="text-3xl font-black mb-6">Il tuo Studio d'Arte ✨</h3>
-                 <p className="text-lg text-slate-600 mb-8 italic">Prendi i pennelli magici e disegna tutto quello che vuoi!</p>
+               <div className="bg-white p-8 rounded-[3rem] shadow-xl border-4 border-slate-100">
+                 <h3 className="text-3xl font-black mb-6 flex items-center gap-4">
+                    <span className="p-3 bg-brand-orange/10 rounded-2xl text-2xl">🎨</span>
+                    Il tuo Studio d'Arte ✨
+                 </h3>
+                 <p className="text-lg text-slate-600 mb-8 italic">Prendi i pennelli magici, scegli un disegno da colorare o crea il tuo capolavoro!</p>
                  <MagicCanvas />
+               </div>
+
+               <div className="bg-white p-8 rounded-[3rem] shadow-xl border-4 border-slate-100">
+                 <h3 className="text-3xl font-black mb-6 flex items-center gap-4">
+                    <span className="p-3 bg-brand-mint/10 rounded-2xl text-2xl">🧩</span>
+                    Puzzle Magici
+                 </h3>
+                 <p className="text-lg text-slate-600 mb-8 italic">Metti insieme i pezzi del puzzle per svelare l'immagine segreta!</p>
+                 <MagicPuzzle />
                </div>
                
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
@@ -421,25 +501,26 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
           >
-             <div className="mb-12 flex items-center gap-4">
+            <div className="mb-12 flex items-center gap-4">
                <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
                <h2 className="text-5xl font-black text-slate-800">Video Curiosi 🎥</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {[
-                 { t: "Come nascono le farfalle?", d: "Vedi la magia della natura!", c: "mint", e: "🦋" },
-                 { t: "Viaggio verso Marte", d: "Esplora lo spazio profondo.", c: "sky", e: "🚀" },
-                 { t: "Il mistero del mare", d: "Scopri i pesci luminosi.", c: "pink", e: "🐠" },
-                 { t: "I segreti del bosco", d: "Ascolta il canto degli alberi.", c: "orange", e: "🌲" },
-                 { t: "Storie di stelle", d: "Impara a riconoscere le costellazioni.", c: "yellow", e: "⭐" },
-                 { t: "Robot amici", d: "Come funzionano le macchine intelligenti.", c: "sky", e: "🤖" },
+                 { t: "Il Ciclo dell'Acqua", d: "Scopri come nasce la pioggia!", c: "sky", e: "💧", id: "0v8i4v1oeT0" },
+                 { t: "Viaggio nel Sistema Solare", d: "Esplora i pianeti con noi.", c: "yellow", e: "🌍", id: "I7mZ9vO9yV0" },
+                 { t: "I Cinque Sensi", d: "Come sentiamo il mondo?", c: "pink", e: "👂", id: "vD98SHeLAt8" },
+                 { t: "Festa degli Animali", d: "Canta e impara gli animali.", c: "mint", e: "🦁", id: "5oYKonYBujg" },
+                 { t: "Perché il cielo è blu?", d: "Scienza per piccoli geni.", c: "orange", e: "☁️", id: "bcV_L6W_jXk" },
+                 { t: "Laviamoci le mani!", d: "Impariamo l'igiene giocando.", c: "sky", e: "🧼", id: "QzL8F7uP0Hk" },
                ].map((video, i) => (
                  <motion.div 
                    key={i}
                    whileHover={{ scale: 1.05 }}
+                   onClick={() => setSelectedVideo(video.id)}
                    className={cn(
-                     "rounded-[2.5rem] overflow-hidden bg-white shadow-xl border-4 group cursor-pointer",
+                     "rounded-[2.5rem] overflow-hidden bg-white shadow-xl border-4 group cursor-pointer h-full flex flex-col",
                      video.c === 'mint' && "border-brand-mint",
                      video.c === 'sky' && "border-brand-sky",
                      video.c === 'pink' && "border-brand-pink",
@@ -456,15 +537,20 @@ export default function App() {
                       video.c === 'yellow' && "bg-brand-yellow/20",
                     )}>
                        {video.e}
-                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
+                          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
                              <PlayCircle className="text-slate-800" size={32} />
                           </div>
                        </div>
                     </div>
-                    <div className="p-6">
-                       <h4 className="text-xl font-black mb-2">{video.t}</h4>
-                       <p className="text-slate-500 text-sm font-medium">{video.d}</p>
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                       <div>
+                         <h4 className="text-xl font-black mb-2">{video.t}</h4>
+                         <p className="text-slate-500 text-sm font-medium">{video.d}</p>
+                       </div>
+                       <div className="mt-4 flex items-center gap-2 text-brand-sky font-bold text-sm">
+                          <PlayCircle size={16} /> Guarda Ora
+                       </div>
                     </div>
                  </motion.div>
                ))}
@@ -474,6 +560,44 @@ export default function App() {
       </AnimatePresence>
 
       <MagicChatbot />
+      
+      {/* Video Modal Player */}
+      <AnimatePresence>
+        {selectedVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 md:p-12"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-white rounded-[3rem] w-full max-w-5xl overflow-hidden shadow-2xl relative"
+            >
+              <button 
+                onClick={() => setSelectedVideo(null)}
+                className="absolute top-6 right-6 z-10 p-4 bg-brand-pink text-white rounded-full shadow-lg hover:rotate-90 transition-transform"
+              >
+                <X />
+              </button>
+              <div className="aspect-video bg-black">
+                <iframe 
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1&rel=0&modestbranding=1`}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="p-8 bg-white flex flex-col md:flex-row justify-between items-center gap-4">
+                 <div className="font-black text-2xl text-slate-800 text-center md:text-left">Stai guardando un video magico! ✨</div>
+                 <MagicButton variant="pink" onClick={() => setSelectedVideo(null)}>Chiudi Player</MagicButton>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Parents Section Preview (Solo in Home) */}
       {activeSection === "home" && (

@@ -20,6 +20,16 @@ const QUIZ_DATA = {
       q: "Cosa brilla in cielo di notte?",
       options: ["Il Sole", "La Luna", "Una Lampadina", "Un Gelato"],
       a: 1
+    },
+    {
+      q: "Quale di questi vive nel mare?",
+      options: ["Leone", "Giraffa", "Balena", "Aquila"],
+      a: 2
+    },
+    {
+      q: "Dove vivono gli uccellini?",
+      options: ["Sottoterra", "Nel nido sugli alberi", "In una grotta", "Sotto l'acqua"],
+      a: 1
     }
   ],
   animali: [
@@ -32,6 +42,16 @@ const QUIZ_DATA = {
       q: "Quale animale fa 'Miao'?",
       options: ["Cane", "Gatto", "Mucca", "Papera"],
       a: 1
+    },
+    {
+      q: "Chi ha il collo lunghissimo?",
+      options: ["Elefante", "Zebra", "Giraffa", "Ippopotamo"],
+      a: 2
+    },
+    {
+      q: "Quale animale striscia per terra?",
+      options: ["Serpente", "Coniglio", "Canguro", "Ghepardo"],
+      a: 0
     }
   ],
   spazio: [
@@ -44,6 +64,16 @@ const QUIZ_DATA = {
       q: "Il Sole è una...",
       options: ["Pianeta", "Luna", "Stella", "Cometa"],
       a: 2
+    },
+    {
+      q: "Cosa indossano gli astronauti per andare nello spazio?",
+      options: ["Pigiama", "Tuta spaziale", "Costume da bagno", "Cappotto"],
+      a: 1
+    },
+    {
+      q: "Quante lune ha la Terra?",
+      options: ["Una", "Due", "Dieci", "Nessuna"],
+      a: 0
     }
   ]
 };
@@ -87,16 +117,20 @@ export const MagicQuiz = () => {
       <div className="p-8 bg-white rounded-[2rem] shadow-xl border-4 border-brand-sky/20">
         <h4 className="text-2xl font-black text-slate-800 mb-6 text-center">Scegli una Categoria! 🎯</h4>
         <div className="grid grid-cols-1 gap-4">
-          {Object.keys(QUIZ_DATA).map((cat) => (
-            <MagicButton 
-              key={cat} 
-              variant={cat === 'natura' ? 'mint' : cat === 'animali' ? 'pink' : 'sky'}
-              onClick={() => setCategory(cat as keyof typeof QUIZ_DATA)}
-              className="w-full capitalize"
-            >
-              {cat}
-            </MagicButton>
-          ))}
+          {Object.keys(QUIZ_DATA).map((cat) => {
+            const typedCat = cat as keyof typeof QUIZ_DATA;
+            return (
+              <div key={cat}>
+                <MagicButton 
+                  variant={typedCat === 'natura' ? 'mint' : typedCat === 'animali' ? 'pink' : 'sky'}
+                  onClick={() => setCategory(typedCat)}
+                  className="w-full capitalize"
+                >
+                  {cat}
+                </MagicButton>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
