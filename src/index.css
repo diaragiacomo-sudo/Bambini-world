@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Fredoka", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Vibrant Palette Colors */
+  --color-brand-sky: #38BDF8;
+  --color-brand-sky-shadow: #0284C7;
+  --color-brand-sky-bg: #F0F9FF;
+  
+  --color-brand-yellow: #FACC15;
+  --color-brand-yellow-shadow: #CA8A04;
+  --color-brand-yellow-bg: #FEF9C3;
+  
+  --color-brand-mint: #4ADE80;
+  --color-brand-mint-shadow: #16A34A;
+  --color-brand-mint-bg: #F0FDF4;
+
+  --color-brand-pink: #F472B6;
+  --color-brand-pink-shadow: #BE185D;
+  --color-brand-pink-bg: #FFF1F2;
+
+  --color-brand-orange: #FB923C;
+  --color-brand-orange-shadow: #C2410C;
+  --color-brand-orange-bg: #FFF7ED;
+
+  --color-brand-purple: #A78BFA;
+  --color-brand-purple-shadow: #7C3AED;
+  --color-brand-purple-bg: #F5F3FF;
+
+  --color-brand-white: #FFFFFF;
+  --color-brand-slate-dark: #334155;
+  --color-brand-slate-border: #1E293B;
+  
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+  --radius-full: 9999px;
+
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-[#E0F2FE] text-slate-800 selection:bg-brand-pink/30;
+  }
+}
+
+@layer utilities {
+  .btn-3d-sky {
+    @apply bg-brand-sky text-white shadow-[0_4px_0_var(--color-brand-sky-shadow)] active:shadow-none active:translate-y-1;
+  }
+  .btn-3d-yellow {
+    @apply bg-brand-yellow text-amber-900 shadow-[0_4px_0_var(--color-brand-yellow-shadow)] active:shadow-none active:translate-y-1;
+  }
+  .btn-3d-mint {
+    @apply bg-brand-mint text-emerald-900 shadow-[0_4px_0_var(--color-brand-mint-shadow)] active:shadow-none active:translate-y-1;
+  }
+  .btn-3d-pink {
+    @apply bg-brand-pink text-white shadow-[0_4px_0_var(--color-brand-pink-shadow)] active:shadow-none active:translate-y-1;
+  }
+  .btn-3d-orange {
+    @apply bg-brand-orange text-white shadow-[0_4px_0_var(--color-brand-orange-shadow)] active:shadow-none active:translate-y-1;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

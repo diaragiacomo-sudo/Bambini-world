@@ -1,0 +1,6 @@
+{
+  "name": "Piccolo Mondo Magico",
+  "description": "Un'esperienza interattiva e magica per bambini con fiabe, giochi ed attività educative colorate.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
