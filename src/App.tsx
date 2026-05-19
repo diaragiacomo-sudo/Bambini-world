@@ -21,7 +21,6 @@ import {
   X,
   Volume2,
   VolumeX,
-  Star as StarIcon,
   PlayCircle,
   Lightbulb
 } from "lucide-react";
@@ -31,7 +30,7 @@ import { MagicChatbot } from "./components/MagicChatbot";
 import { MagicQuiz } from "./components/MagicQuiz";
 import { MagicCanvas } from "./components/MagicCanvas";
 import { MagicPuzzle } from "./components/MagicPuzzle";
-import { Cloud, Star, Rainbow } from "./components/MagicShapes";
+import { Cloud, Rainbow } from "./components/MagicShapes";
 import { cn } from "./lib/utils";
 
 const NAV_ITEMS = [
@@ -84,26 +83,44 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#E0F2FE] to-[#F0F9FF] overflow-x-hidden font-sans">
-      {/* Background Shapes */}
+    <div className="min-h-screen bg-[#E0F7FA] relative overflow-x-hidden">
+      {/* Cartoon Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Animated Sky Elements */}
+        {/* Sun */}
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
+          className="absolute top-10 right-10 md:right-32 text-6xl md:text-8xl flex items-center justify-center"
+        >
+          ☀️
+        </motion.div>
+
         <motion.div 
           animate={{ x: [-20, 20, -20] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-10 right-20 w-48 h-20 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-80" 
-        />
+          className="absolute top-10 right-1/4"
+        >
+          <Cloud />
+        </motion.div>
         <motion.div 
           animate={{ x: [20, -20, 20] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-48 left-10 w-32 h-12 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-60" 
-        />
-        <motion.div 
-          animate={{ x: [-30, 30, -30] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-20 right-1/4 w-40 h-16 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-40" 
-        />
-        <Star className="absolute top-1/4 left-1/3" />
-        <Star className="absolute bottom-1/4 right-1/4" delay={1} />
+          className="absolute top-48 left-10 md:left-20"
+        >
+          <Cloud />
+        </motion.div>
+        
+        {/* Cartoon Hills (Background) */}
+        <svg className="absolute bottom-0 w-full h-[50vh] opacity-20" viewBox="0 0 1440 320" preserveAspectRatio="none">
+           <path fill="#4ADE80" d="M0,160L80,170.7C160,181,320,203,480,186.7C640,171,800,117,960,117.3C1120,117,1280,171,1360,197.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        </svg>
+
+        {/* Playground Elements (Distant silhouette style) */}
+        <div className="absolute bottom-12 left-[15%] text-5xl opacity-40 -rotate-12">🛝</div>
+        <div className="absolute bottom-24 right-[20%] text-6xl opacity-30 rotate-12">🎠</div>
+        <div className="absolute bottom-32 left-1/2 text-4xl opacity-25">🌳</div>
+        <div className="absolute bottom-40 right-1/4 text-3xl opacity-20">🦋</div>
       </div>
 
       {/* Navigation */}
@@ -204,6 +221,42 @@ export default function App() {
                 <Mascot className="relative z-10 scale-125 md:scale-150" />
               </div>
             </header>
+
+            {/* Magic Play Section */}
+            <section className="relative z-20 px-6 py-12 max-w-7xl mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                className="rounded-[4rem] overflow-hidden border-8 border-white shadow-2xl relative aspect-[21/9] bg-brand-sky/10"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1472162072142-d5af1242048e?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Cartoon children playing in the park" 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-sky/60 via-transparent to-transparent flex items-end justify-center pb-12">
+                   <div className="text-white text-center px-4">
+                      <motion.h4 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 drop-shadow-2xl"
+                      >
+                        Il Divertimento è per Tutti! ⚽
+                      </motion.h4>
+                      <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-xl md:text-2xl font-bold italic drop-shadow-lg"
+                      >
+                        Giocare insieme è la magia più grande del mondo.
+                      </motion.p>
+                   </div>
+                </div>
+              </motion.div>
+            </section>
 
             {/* Features Grid */}
             <main className="relative z-10 px-6 py-24 bg-white/50 backdrop-blur-sm">

@@ -116,7 +116,7 @@ export const MagicPuzzle = () => {
             <Trophy size={80} className="mb-4 animate-bounce" />
             <h4 className="text-4xl font-black mb-2">Bravissimo!</h4>
             <p className="font-bold mb-6 italic text-brand-mint-bg">Hai ricomposto la magia!</p>
-            <MagicButton variant="white" onClick={initPuzzle}>Gioca Ancora</MagicButton>
+            <MagicButton variant="yellow" onClick={initPuzzle}>Gioca Ancora</MagicButton>
           </motion.div>
         )}
       </div>
