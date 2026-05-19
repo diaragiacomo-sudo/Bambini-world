@@ -21,6 +21,7 @@ import {
   X,
   Volume2,
   VolumeX,
+  Music,
   PlayCircle,
   Lightbulb
 } from "lucide-react";
@@ -46,6 +47,27 @@ export default function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
+  const [isMusicOn, setIsMusicOn] = useState(false);
+  const [bgMusic] = useState(new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
+
+  useEffect(() => {
+    bgMusic.loop = true;
+    bgMusic.volume = 0.3; // Low volume for background
+    if (isMusicOn) {
+      bgMusic.play().catch(e => console.log("Audio play blocked until user interaction"));
+    } else {
+      bgMusic.pause();
+    }
+  }, [isMusicOn, bgMusic]);
+
+  // Clean up
+  useEffect(() => {
+    return () => {
+      bgMusic.pause();
+      bgMusic.src = "";
+    };
+  }, [bgMusic]);
+
   const [loadingStory, setLoadingStory] = useState(false);
   const [generatedStory, setGeneratedStory] = useState("");
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -220,13 +242,29 @@ export default function App() {
 
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => setIsSoundOn(!isSoundOn)}
-            className="p-3 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
+            onClick={() => setIsMusicOn(!isMusicOn)}
+            className={cn(
+              "p-3 rounded-full shadow-md transition-all flex items-center gap-2",
+              isMusicOn ? "bg-brand-sky text-white" : "bg-white text-slate-400"
+            )}
+            title={isMusicOn ? "Spegni Musica" : "Accendi Musica"}
           >
-            {isSoundOn ? <Volume2 className="text-brand-pink" /> : <VolumeX className="text-slate-400" />}
+            <Music size={20} />
+            <span className="hidden md:inline font-bold text-sm">{isMusicOn ? "Musica ON" : "Musica OFF"}</span>
           </button>
           <button 
-            className="lg:hidden p-3 bg-white rounded-full shadow-md"
+            onClick={() => setIsSoundOn(!isSoundOn)}
+            className={cn(
+              "p-3 rounded-full shadow-md transition-all flex items-center gap-2",
+              isSoundOn ? "bg-brand-pink text-white" : "bg-white text-slate-400"
+            )}
+            title={isSoundOn ? "Disattiva Voci" : "Attiva Voci"}
+          >
+            {isSoundOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            <span className="hidden md:inline font-bold text-sm">{isSoundOn ? "Suoni ON" : "Suoni OFF"}</span>
+          </button>
+          <button 
+            className="lg:hidden p-3 bg-white rounded-full shadow-md text-slate-600"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <Menu />
