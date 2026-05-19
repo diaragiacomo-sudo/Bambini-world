@@ -48,17 +48,28 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isMusicOn, setIsMusicOn] = useState(false);
-  const [bgMusic] = useState(new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [bgMusic] = useState(new Audio("https://www.singing-bell.com/wp-content/uploads/2015/01/Twinkle-Twinkle-Little-Star-Singing-Bell.mp3"));
 
   useEffect(() => {
     bgMusic.loop = true;
-    bgMusic.volume = 0.3; // Low volume for background
-    if (isMusicOn) {
-      bgMusic.play().catch(e => console.log("Audio play blocked until user interaction"));
+    bgMusic.volume = 0.15; // Volume low for background music
+    if (isMusicOn && hasInteracted) {
+      bgMusic.play().catch(e => console.log("Audio play blocked until user interaction", e));
     } else {
       bgMusic.pause();
     }
-  }, [isMusicOn, bgMusic]);
+  }, [isMusicOn, bgMusic, hasInteracted]);
+
+  // Handle first interaction anywhere
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      setHasInteracted(true);
+      window.removeEventListener("click", handleFirstInteraction);
+    };
+    window.addEventListener("click", handleFirstInteraction);
+    return () => window.removeEventListener("click", handleFirstInteraction);
+  }, []);
 
   // Clean up
   useEffect(() => {
@@ -76,7 +87,8 @@ export default function App() {
 
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-  const navigateTo = (section: string) => {
+   const navigateTo = (section: string) => {
+    setHasInteracted(true);
     setActiveSection(section.toLowerCase());
     setIsMenuOpen(false);
     setSelectedVideo(null); // Reset video on navigation
@@ -100,11 +112,9 @@ export default function App() {
       const msg = new SpeechSynthesisUtterance(textToSpeak);
       msg.lang = "it-IT";
       
-      // Cerca una voce italiana (preferibilmente femminile)
       const voices = window.speechSynthesis.getVoices();
       const italianVoices = voices.filter(v => v.lang.startsWith('it'));
       
-      // Spesso le voci con nomi come 'Alice', 'Elsa' o contenenti 'female' sono femminili
       const femaleVoice = italianVoices.find(v => 
         v.name.toLowerCase().includes('female') || 
         v.name.toLowerCase().includes('alice') || 
@@ -114,33 +124,41 @@ export default function App() {
       
       if (femaleVoice) msg.voice = femaleVoice;
 
-      // Tono calmo e rilassato per tutte le sezioni
+      msg.onend = () => {
+        if (activeSection === "home" && !isMusicOn) {
+          setIsMusicOn(true);
+        }
+      };
+
       msg.pitch = 1.0;
-      msg.rate = 0.85; // Più lento e calmo
+      msg.rate = 0.85; 
       
-      // Solo leggermente più vivace per la home, ma comunque lenta
       if (activeSection === 'home') {
         msg.pitch = 1.05;
         msg.rate = 0.9;
       }
       
-      // Piccola pausa per lasciare terminare eventuali suoni di transizione
       setTimeout(() => {
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(msg);
       }, 300);
     };
 
+    // Initial speak
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = speak;
     } else {
       speak();
     }
+
+    // Repeat every 30 seconds
+    const intervalId = setInterval(speak, 30000);
     
     return () => {
       window.speechSynthesis.cancel();
+      clearInterval(intervalId);
     };
-  }, [activeSection, isSoundOn]);
+  }, [activeSection, isSoundOn, isMusicOn]);
 
   const generateStory = async () => {
     setLoadingStory(true);
@@ -329,12 +347,12 @@ export default function App() {
                 className="rounded-[4rem] overflow-hidden border-8 border-white shadow-2xl relative aspect-[21/9] bg-brand-sky/10"
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1519337020834-263d80a1b7de?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Bambini che giocano al parco" 
+                  src="https://images.unsplash.com/photo-1545627221-df3f3366f00e?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Bambini felici che saltano" 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-sky/60 via-transparent to-transparent flex items-end justify-center pb-12">
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-sky/80 via-transparent to-transparent flex items-end justify-center pb-12">
                    <div className="text-white text-center px-4">
                       <motion.h4 
                         initial={{ opacity: 0, y: 20 }}
@@ -421,12 +439,12 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {[
-                 { t: "Il Ballo dell'Elefante", d: "Una canzone ritmata per saltare tutti insieme!", color: "sky", icon: "🐘", url: "https://www.w3schools.com/html/horse.mp3" },
-                 { t: "La Danza Fatata", d: "Melodia dolce per sognare ad occhi aperti.", color: "pink", icon: "🧚", url: "https://actions.google.com/sounds/v1/science_fiction/stutter_fast.ogg" },
-                 { t: "Avventura nel Bosco", d: "Segui il ritmo della natura e degli animali.", color: "mint", icon: "🦊", url: "https://actions.google.com/sounds/v1/foley/footsteps_on_leaves.ogg" },
-                 { t: "Il Treno dei Sapori", d: "Un viaggio musicale tra frutta e verdura.", color: "orange", icon: "🚂", url: "https://actions.google.com/sounds/v1/transportation/clack_clack_clack_on_creaky_bridge.ogg" },
-                 { t: "Corri Piccolo Drago", d: "Musica energica per i piccoli eroi.", color: "yellow", icon: "🐲", url: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" },
-                 { t: "Sogni D'Oro", d: "Una ninna nanna per rilassarsi prima di dormire.", color: "pink", icon: "🌙", url: "https://actions.google.com/sounds/v1/water/rain_heavy_loud.ogg" },
+                 { t: "Le Ruote del Bus", d: "Girano e girano per tutta la città! Una canzone divertente con le parole.", color: "sky", icon: "🚌", url: "https://www.singing-bell.com/wp-content/uploads/2015/10/The-Wheels-on-the-Bus-Singing-Bell.mp3" },
+                 { t: "Nella Vecchia Fattoria", d: "Quanti animali ci sono? Cantiamo insieme i loro versi!", color: "orange", icon: "🚜", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Old-MacDonald-Had-a-Farm-Singing-Bell.mp3" },
+                 { t: "Se Sei Felice", d: "Batti le mani e canta con noi la gioia di essere amici.", color: "pink", icon: "👏", url: "https://www.singing-bell.com/wp-content/uploads/2015/05/If-Youre-Happy-and-You-Know-It-Singing-Bell.mp3" },
+                 { t: "Incy Wincy Ragnetto", d: "La storia del piccolo ragnetto che sale sulla grondaia.", color: "mint", icon: "🕷️", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Itsy-Bitsy-Spider-Singing-Bell.mp3" },
+                 { t: "Brilla Brilla Stellina", d: "Una dolce canzone per guardare il cielo di notte.", color: "yellow", icon: "⭐", url: "https://www.singing-bell.com/wp-content/uploads/2015/01/Twinkle-Twinkle-Little-Star-Singing-Bell.mp3" },
+                 { t: "Cinque Scimmiette", d: "Saltano sul letto e... oh no! Quante ne restano?", color: "sky", icon: "🐒", url: "https://www.singing-bell.com/wp-content/uploads/2014/12/Five-Little-Monkeys-Singing-Bell.mp3" },
                ].map((song, i) => (
                  <motion.div 
                    key={i}
