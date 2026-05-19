@@ -87,13 +87,108 @@ export default function App() {
 
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-   const navigateTo = (section: string) => {
+  const navigateTo = (section: string) => {
     setHasInteracted(true);
     setActiveSection(section.toLowerCase());
     setIsMenuOpen(false);
     setSelectedVideo(null); // Reset video on navigation
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const CloudOverlay = () => (
+    <div className="fixed inset-0 pointer-events-none z-[60] overflow-hidden">
+      {/* Soft Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(255,255,255,0.4)_110%)]" />
+      
+      {/* Top Clouds */}
+      <div className="absolute top-0 left-0 right-0 flex justify-around opacity-40">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={`top-${i}`}
+            animate={{ 
+              y: [-10, 10, -10],
+              x: [0, (i % 2 === 0 ? 20 : -20), 0]
+            }}
+            transition={{ 
+              duration: 8 + i * 2, 
+              repeat: Infinity, 
+              ease: "easeInOut",
+              delay: i * 0.3
+            }}
+            className="transform -translate-y-8"
+          >
+            <Cloud className="scale-[1.8]" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Bottom Clouds */}
+      <div className="absolute bottom-0 left-0 right-0 flex justify-around opacity-40">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={`bottom-${i}`}
+            animate={{ 
+              y: [10, -10, 10],
+              x: [0, (i % 2 === 0 ? -20 : 20), 0]
+            }}
+            transition={{ 
+              duration: 10 + i * 2, 
+              repeat: Infinity, 
+              ease: "easeInOut",
+              delay: i * 0.5
+            }}
+            className="transform translate-y-8"
+          >
+            <Cloud className="scale-[1.8]" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Left Clouds */}
+      <div className="absolute top-0 bottom-0 left-0 flex flex-col justify-around opacity-25">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={`left-${i}`}
+            animate={{ 
+              x: [-10, 20, -10],
+              y: [0, (i % 2 === 0 ? 30 : -30), 0]
+            }}
+            transition={{ 
+              duration: i * 3 + 15, 
+              repeat: Infinity, 
+              ease: "easeInOut",
+              delay: i * 1.5
+            }}
+            className="transform -translate-x-12"
+          >
+            <Cloud className="scale-[2.5]" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Right Clouds */}
+      <div className="absolute top-0 bottom-0 right-0 flex flex-col justify-around opacity-25">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={`right-${i}`}
+            animate={{ 
+              x: [10, -20, 10],
+              y: [0, (i % 2 === 0 ? -30 : 30), 0]
+            }}
+            transition={{ 
+              duration: i * 4 + 12, 
+              repeat: Infinity, 
+              ease: "easeInOut",
+              delay: i * 1.8
+            }}
+            className="transform translate-x-12"
+          >
+            <Cloud className="scale-[2.5]" />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (!isSoundOn) return;
@@ -150,13 +245,9 @@ export default function App() {
     } else {
       speak();
     }
-
-    // Repeat every 30 seconds
-    const intervalId = setInterval(speak, 30000);
     
     return () => {
       window.speechSynthesis.cancel();
-      clearInterval(intervalId);
     };
   }, [activeSection, isSoundOn, isMusicOn]);
 
@@ -184,6 +275,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#E0F7FA] relative overflow-x-hidden">
+      <CloudOverlay />
       {/* Cartoon Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* Animated Sky Elements */}
