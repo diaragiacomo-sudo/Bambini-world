@@ -40,11 +40,18 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
+  const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [loadingStory, setLoadingStory] = useState(false);
   const [generatedStory, setGeneratedStory] = useState("");
   const [storyTopic, setStoryTopic] = useState("");
+
+  const navigateTo = (section: string) => {
+    setActiveSection(section.toLowerCase());
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const generateStory = async () => {
     setLoadingStory(true);
@@ -75,7 +82,7 @@ export default function App() {
 
       {/* Navigation */}
       <nav className="relative z-50 px-6 py-4 flex items-center justify-between bg-white/80 backdrop-blur-md border-b-4 border-[#BAE6FD]">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo("home")}>
           <div className="w-10 h-10 bg-brand-yellow rounded-xl flex items-center justify-center shadow-[0_4px_0_#EAB308]">
             <span className="text-xl">✨</span>
           </div>
@@ -89,13 +96,18 @@ export default function App() {
           {NAV_ITEMS.map((item) => (
             <button 
               key={item.name}
+              onClick={() => navigateTo(item.name === "Per Genitori" ? "genitori" : item.name)}
               className={cn(
                 "px-6 py-2 rounded-full font-bold text-lg transition-all",
-                item.color === "sky" && "bg-brand-sky text-white shadow-[0_4px_0_#0284C7]",
-                item.color === "yellow" && "bg-brand-yellow text-amber-900 shadow-[0_4px_0_#CA8A04]",
-                item.color === "mint" && "bg-brand-mint text-emerald-900 shadow-[0_4px_0_#16A34A]",
-                item.color === "pink" && "bg-brand-pink text-white shadow-[0_4px_0_#BE185D]",
-                item.color === "orange" && "bg-brand-orange text-white shadow-[0_4px_0_#C2410C]",
+                activeSection === item.name.toLowerCase() || (activeSection === "genitori" && item.name === "Per Genitori")
+                  ? "bg-slate-800 text-white scale-105"
+                  : cn(
+                      item.color === "sky" && "bg-brand-sky text-white shadow-[0_4px_0_#0284C7] hover:translate-y-[-2px]",
+                      item.color === "yellow" && "bg-brand-yellow text-amber-900 shadow-[0_4px_0_#CA8A04] hover:translate-y-[-2px]",
+                      item.color === "mint" && "bg-brand-mint text-emerald-900 shadow-[0_4px_0_#16A34A] hover:translate-y-[-2px]",
+                      item.color === "pink" && "bg-brand-pink text-white shadow-[0_4px_0_#BE185D] hover:translate-y-[-2px]",
+                      item.color === "orange" && "bg-brand-orange text-white shadow-[0_4px_0_#C2410C] hover:translate-y-[-2px]",
+                    )
               )}
             >
               {item.name}
@@ -119,230 +131,225 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <header className="relative z-10 px-6 pt-12 pb-24 md:pt-24 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-        <div className="flex-1 text-center md:text-left">
-          <motion.h2 
+      {/* Main Content Areas */}
+      <AnimatePresence mode="wait">
+        {activeSection === "home" && (
+          <motion.div
+            key="home"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-[80px] font-black text-slate-800 leading-[1.1] mb-8"
+            exit={{ opacity: 0, y: -20 }}
           >
-            Esplora, Impara e <span className="text-brand-sky">Sorridi!</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-2xl text-slate-500 mb-10 max-w-xl font-medium leading-relaxed"
-          >
-            Benvenuti nel piccolo mondo magico dove ogni giorno è una nuova avventura colorata tra draghi gentili e stelle parlanti.
-          </motion.p>
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap justify-center md:justify-start gap-6 items-center"
-          >
-            <MagicButton variant="yellow" className="px-12 py-5 text-2xl rounded-[40px]">Inizia l'Avventura!</MagicButton>
-            <div className="flex items-center gap-3">
-               <div className="w-12 h-12 bg-brand-mint rounded-full flex items-center justify-center text-white shadow-[0_4px_0_#16A34A] cursor-pointer hover:translate-y-1 hover:shadow-none transition-all">
-                 <PlayCircle size={28} />
-               </div>
-               <span className="font-bold text-slate-800 text-lg">Guarda il Trailer</span>
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="flex-1 flex justify-center items-center">
-          <Mascot className="relative z-10 scale-125 md:scale-150" />
-        </div>
-      </header>
-
-      {/* Features Grid */}
-      <main className="relative z-10 px-6 py-24 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-black text-slate-800 mb-4">Esplora le Attività 🚀</h3>
-            <p className="text-lg text-slate-500">Abbiamo preparato tante sorprese per te!</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
-            <ActivityCard 
-              title="Fiabe Incantate" 
-              desc="Storie magiche che prendono vita."
-              icon={BookOpen}
-              color="pink"
-            />
-            <ActivityCard 
-              title="Giochi Educativi" 
-              desc="Mini quiz e giochi per diventare super intelligenti."
-              icon={Gamepad2}
-              color="sky"
-            />
-            <ActivityCard 
-              title="Laboratorio" 
-              desc="Impara a disegnare e creare cose bellissime."
-              icon={Palette}
-              color="orange"
-            />
-            <ActivityCard 
-              title="Piccoli Scienziati" 
-              desc="Video brevi per scoprire come funziona il mondo."
-              icon={Video}
-              color="mint"
-            />
-          </div>
-
-          {/* AI Story Generator Section */}
-          <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border-4 border-brand-pink/20 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-pink opacity-10 rounded-bl-full -z-10" />
-            <div className="max-w-3xl mx-auto text-center">
-              <h3 className="text-3xl md:text-5xl font-black text-slate-800 mb-6">Generatore di Fiabe 📖✨</h3>
-              <p className="text-lg text-slate-600 mb-8 font-medium">
-                Scegli un tema (es. bosco, razzo, draghetto) e lascia che la magia crei una storia per te!
-              </p>
-              
-              <div className="flex flex-col md:flex-row gap-4 mb-12">
-                <input 
-                  type="text" 
-                  value={storyTopic}
-                  onChange={(e) => setStoryTopic(e.target.value)}
-                  placeholder="Di cosa vuoi leggere oggi? 🧚"
-                  className="flex-1 px-8 py-4 rounded-full text-xl border-4 border-brand-pink/10 focus:border-brand-pink focus:outline-none bg-brand-pink/5 placeholder:text-brand-pink/60 transition-all"
-                />
-                <MagicButton 
-                  variant="pink" 
-                  onClick={generateStory}
-                  className="whitespace-nowrap"
+            {/* Hero Section */}
+            <header className="relative z-10 px-6 pt-12 pb-24 md:pt-24 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+              <div className="flex-1 text-center md:text-left">
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-6xl md:text-[80px] font-black text-slate-800 leading-[1.1] mb-8"
                 >
-                  {loadingStory ? "Creando Magia..." : "Crea Fiaba!"}
-                </MagicButton>
+                  Esplora, Impara e <span className="text-brand-sky">Sorridi!</span>
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-2xl text-slate-500 mb-10 max-w-xl font-medium leading-relaxed"
+                >
+                  Benvenuti nel piccolo mondo magico dove ogni giorno è una nuova avventura colorata tra draghi gentili e stelle parlanti.
+                </motion.p>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex flex-wrap justify-center md:justify-start gap-6 items-center"
+                >
+                  <MagicButton variant="yellow" onClick={() => navigateTo("giochi")} className="px-12 py-5 text-2xl rounded-[40px]">Inizia l'Avventura!</MagicButton>
+                  <div className="flex items-center gap-3">
+                     <div className="w-12 h-12 bg-brand-mint rounded-full flex items-center justify-center text-white shadow-[0_4px_0_#16A34A] cursor-pointer hover:translate-y-1 hover:shadow-none transition-all">
+                       <PlayCircle size={28} />
+                     </div>
+                     <span className="font-bold text-slate-800 text-lg">Guarda il Trailer</span>
+                  </div>
+                </motion.div>
               </div>
 
-              <AnimatePresence mode="wait">
+              <div className="flex-1 flex justify-center items-center">
+                <Mascot className="relative z-10 scale-125 md:scale-150" />
+              </div>
+            </header>
+
+            {/* Features Grid */}
+            <main className="relative z-10 px-6 py-24 bg-white/50 backdrop-blur-sm">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-16">
+                  <h3 className="text-4xl font-black text-slate-800 mb-4">Esplora le Attività 🚀</h3>
+                  <p className="text-lg text-slate-500">Abbiamo preparato tante sorprese per te!</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+                  <ActivityCard 
+                    title="Fiabe Incantate" 
+                    desc="Storie magiche che prendono vita."
+                    icon={BookOpen}
+                    color="pink"
+                    onClick={() => navigateTo("fiabe")}
+                  />
+                  <ActivityCard 
+                    title="Giochi Educativi" 
+                    desc="Mini quiz e giochi per diventare super intelligenti."
+                    icon={Gamepad2}
+                    color="sky"
+                    onClick={() => navigateTo("giochi")}
+                  />
+                  <ActivityCard 
+                    title="Laboratorio" 
+                    desc="Impara a disegnare e creare cose bellissime."
+                    icon={Palette}
+                    color="orange"
+                    onClick={() => navigateTo("creatività")}
+                  />
+                  <ActivityCard 
+                    title="Piccoli Scienziati" 
+                    desc="Video brevi per scoprire come funziona il mondo."
+                    icon={Video}
+                    color="mint"
+                    onClick={() => navigateTo("video")}
+                  />
+                </div>
+              </div>
+            </main>
+          </motion.div>
+        )}
+
+        {activeSection === "fiabe" && (
+          <motion.div
+            key="fiabe"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
+          >
+            <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Fiabe Incantate 📖</h2>
+            </div>
+            {/* Move Generator here */}
+            <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border-4 border-brand-pink/20 overflow-hidden relative">
+              <div className="max-w-3xl mx-auto text-center">
+                <h3 className="text-3xl md:text-5xl font-black text-slate-800 mb-6">Generatore di Fiabe ✨</h3>
+                <p className="text-lg text-slate-600 mb-8 font-medium">Scegli un tema e lascia che la magia crei una storia per te!</p>
+                <div className="flex flex-col md:flex-row gap-4 mb-12">
+                  <input 
+                    type="text" 
+                    value={storyTopic}
+                    onChange={(e) => setStoryTopic(e.target.value)}
+                    placeholder="Di cosa vuoi leggere oggi? 🧚"
+                    className="flex-1 px-8 py-4 rounded-full text-xl border-4 border-brand-pink/10 focus:border-brand-pink focus:outline-none bg-brand-pink/5"
+                  />
+                  <MagicButton variant="pink" onClick={generateStory}>{loadingStory ? "Creando..." : "Crea Fiaba!"}</MagicButton>
+                </div>
                 {generatedStory && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="p-8 bg-brand-pink/5 rounded-3xl border-2 border-dashed border-brand-pink/30 text-left relative"
-                  >
-                    <div className="absolute -top-4 -left-4 text-4xl transform -rotate-12">💭</div>
-                    <div className="absolute -bottom-4 -right-4 text-4xl transform rotate-12">✨</div>
-                    <p className="text-xl text-slate-700 leading-relaxed whitespace-pre-wrap font-medium italic">
-                      {generatedStory}
-                    </p>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 bg-brand-pink/5 rounded-3xl text-left border-2 border-dashed border-brand-pink/30 font-medium italic leading-relaxed whitespace-pre-wrap">
+                    {generatedStory}
                   </motion.div>
                 )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Educational Game Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-24">
-            <div>
-              <h3 className="text-3xl font-black text-slate-800 mb-6">Sfida la tua Mente! 🧠</h3>
-              <p className="text-lg text-slate-600 mb-8 font-medium">
-                Ogni giorno un piccolo quiz per scoprire nuove cose sul mondo che ci circonda.
-              </p>
-              <div className="p-6 bg-brand-sky/10 rounded-3xl border-2 border-brand-sky/20 flex items-center gap-4">
-                 <div className="text-4xl">🏅</div>
-                 <div>
-                    <div className="font-black text-slate-800">Guadagna Medaglie!</div>
-                    <div className="text-slate-600">Completa il quiz per sbloccare il badge di oggi.</div>
-                 </div>
               </div>
             </div>
-            <MagicQuiz />
-          </div>
+          </motion.div>
+        )}
 
-          {/* Magic Slider Section */}
-          <div className="mt-32">
-             <div className="text-center mb-12">
-                <h3 className="text-3xl font-black text-slate-800 mb-4">Mondi da Sogno 🌈</h3>
-                <p className="text-slate-500">I luoghi più belli della nostra fantasia!</p>
-             </div>
-             <div className="flex gap-4 overflow-x-auto pb-8 snap-x no-scrollbar">
-                {[
-                  { t: "Il Bosco delle Fate", i: "🌲✨", c: "mint" },
-                  { t: "L'Isola Volante", i: "🏝️☁️", c: "sky" },
-                  { t: "Il Vulcano di Cioccolato", i: "🌋🍫", c: "orange" },
-                  { t: "La Luna di Formaggio", i: "🌙🧀", c: "yellow" },
-                  { t: "Il Mondo Rainbow", i: "🌈🦄", c: "pink" },
-                ].map((item, idx) => (
-                  <motion.div 
-                    key={idx}
-                    whileHover={{ scale: 1.05 }}
-                    className={cn(
-                      "snap-center min-w-[280px] h-[350px] rounded-[3rem] p-8 flex flex-col items-center justify-center text-center border-4 relative overflow-hidden",
-                      item.c === 'mint' && "bg-brand-mint/20 border-brand-mint text-green-900",
-                      item.c === 'sky' && "bg-brand-sky/20 border-brand-sky text-sky-900",
-                      item.c === 'orange' && "bg-brand-orange/20 border-brand-orange text-orange-900",
-                      item.c === 'pink' && "bg-brand-pink/20 border-brand-pink text-pink-900",
-                      item.c === 'yellow' && "bg-brand-yellow/20 border-brand-yellow text-yellow-900",
-                    )}
-                  >
-                    <div className="text-7xl mb-6">{item.i}</div>
-                    <div className="text-2xl font-black">{item.t}</div>
-                    <div className="absolute top-4 right-6 text-sm font-bold opacity-30 italic">#Magia{idx}</div>
-                  </motion.div>
-                ))}
-             </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Parents Section Preview */}
-      <section className="relative z-10 px-6 py-24 max-w-7xl mx-auto">
-        <div className="bg-brand-yellow/30 p-8 md:p-16 rounded-[3rem] border-4 border-dashed border-brand-yellow flex flex-col md:flex-row items-center gap-12 shadow-2xl">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-4 text-brand-orange">
-              <Heart fill="currentColor" size={24} />
-              <span className="font-bold text-lg uppercase tracking-wider">Per i Grandi</span>
+        {activeSection === "giochi" && (
+          <motion.div
+            key="giochi"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
+          >
+            <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Sala Giochi 🎮</h2>
             </div>
-            <h3 className="text-3xl md:text-5xl font-black text-slate-800 mb-6">Area Protetta per i Genitori</h3>
-            <p className="text-lg text-slate-700 mb-8 leading-relaxed">
-              Gestisci il tempo di gioco, scopri le attività educative consigliate e monitora i progressi dei tuoi piccoli esploratori in totale sicurezza.
-            </p>
-            <MagicButton variant="yellow" icon={Settings} className="bg-white hover:bg-slate-50 border-slate-200">
-              Gestisci Account
-            </MagicButton>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+               <div><h3 className="text-3xl font-black mb-6">Sfida la tua Mente! 🧠</h3><MagicQuiz /></div>
+               <div className="bg-brand-sky/10 p-8 rounded-3xl border-2 border-brand-sky/20">
+                  <h4 className="text-2xl font-black mb-4 italic">Prossimamente...</h4>
+                  <p className="text-slate-600">Altre sfide magiche e mini-giochi interattivi stanno per arrivare!</p>
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {["creatività", "video", "genitori"].includes(activeSection) && (
+          <motion.div
+            key="coming-soon"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative z-10 px-6 py-48 text-center"
+          >
+            <div className="inline-block p-12 bg-white rounded-[4rem] shadow-2xl border-4 border-dashed border-brand-yellow">
+              <div className="text-6xl mb-6">🚀</div>
+              <h2 className="text-4xl font-black mb-4">Lavori in Corso!</h2>
+              <p className="text-xl text-slate-500 mb-8 italic">Stiamo preparando qualcosa di unico...</p>
+              <MagicButton variant="yellow" onClick={() => navigateTo("home")}>Torna alla Home</MagicButton>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Parents Section Preview (Solo in Home) */}
+      {activeSection === "home" && (
+        <section className="relative z-10 px-6 py-24 max-w-7xl mx-auto">
+          <div className="bg-brand-yellow/30 p-8 md:p-16 rounded-[3rem] border-4 border-dashed border-brand-yellow flex flex-col md:flex-row items-center gap-12 shadow-2xl">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-4 text-brand-orange">
+                <Heart fill="currentColor" size={24} />
+                <span className="font-bold text-lg uppercase tracking-wider">Per i Grandi</span>
+              </div>
+              <h3 className="text-3xl md:text-5xl font-black text-slate-800 mb-6">Area Protetta per i Genitori</h3>
+              <p className="text-lg text-slate-700 mb-8 leading-relaxed">
+                Gestisci il tempo di gioco, scopri le attività educative consigliate e monitora i progressi dei tuoi piccoli esploratori in totale sicurezza.
+              </p>
+              <MagicButton variant="yellow" icon={Settings} onClick={() => navigateTo("genitori")} className="bg-white hover:bg-slate-50 border-slate-200">
+                Gestisci Account
+              </MagicButton>
+            </div>
+            <div className="flex-1 w-full flex justify-center">
+               <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { e: "🛡️", t: "Sicuro" },
+                    { e: "⏰", t: "Timer" },
+                    { e: "📊", t: "Report" },
+                    { e: "🧑‍🏫", t: "Scuola" },
+                  ].map(badge => (
+                    <div key={badge.t} className="p-4 bg-white rounded-2xl shadow-sm text-center border-2 border-slate-50 hover:border-brand-yellow transition-colors">
+                       <div className="text-3xl mb-2">{badge.e}</div>
+                       <div className="font-bold text-slate-800">{badge.t}</div>
+                    </div>
+                  ))}
+               </div>
+            </div>
           </div>
-          <div className="flex-1 w-full flex justify-center">
-             <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-white rounded-2xl shadow-sm text-center">
-                   <div className="text-3xl mb-2">🛡️</div>
-                   <div className="font-bold">Sicuro</div>
-                </div>
-                <div className="p-4 bg-white rounded-2xl shadow-sm text-center">
-                   <div className="text-3xl mb-2">⏰</div>
-                   <div className="font-bold">Timer</div>
-                </div>
-                <div className="p-4 bg-white rounded-2xl shadow-sm text-center">
-                   <div className="text-3xl mb-2">📊</div>
-                   <div className="font-bold">Report</div>
-                </div>
-                <div className="p-4 bg-white rounded-2xl shadow-sm text-center">
-                   <div className="text-3xl mb-2">🧑‍🏫</div>
-                   <div className="font-bold">Scuola</div>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Footer */}
-      <footer className="relative z-10 bg-[#334155] border-t-4 border-[#1E293B] py-8 px-10 text-white">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-[14px]">© 2026 MondoMagico - Sicurezza Certificata per Bambini</div>
-          <div className="flex flex-wrap justify-center gap-8 text-[14px] font-medium">
-             <span className="cursor-pointer hover:text-brand-pink italic underline underline-offset-4 decoration-sky-400">Privacy Policy</span>
-             <span className="cursor-pointer hover:text-brand-pink italic underline underline-offset-4 decoration-sky-400">Contatti</span>
-             <span className="cursor-pointer hover:text-brand-pink italic underline underline-offset-4 decoration-sky-400">Guida per i piccoli</span>
+      <footer className="relative z-10 bg-[#334155] border-t-4 border-[#1E293B] py-12 px-10 text-white mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
+          <div className="text-[14px]">
+             <div className="font-black text-2xl mb-2 text-brand-sky">MondoMagico ✨</div>
+             © 2026 Piccolo Mondo Magico - Sicurezza Certificata
           </div>
-          <div className="flex gap-3">
-             <div className="w-8 h-8 bg-[#475569] rounded-full" />
-             <div className="w-8 h-8 bg-[#475569] rounded-full" />
+          <div className="flex flex-wrap justify-center gap-8 text-[14px] font-bold">
+             <span onClick={() => navigateTo("home")} className="cursor-pointer hover:text-brand-sky transition-colors">Home</span>
+             <span onClick={() => navigateTo("fiabe")} className="cursor-pointer hover:text-brand-sky transition-colors">Fiabe</span>
+             <span onClick={() => navigateTo("giochi")} className="cursor-pointer hover:text-brand-sky transition-colors">Giochi</span>
+             <span onClick={() => navigateTo("genitori")} className="cursor-pointer hover:text-brand-sky transition-colors">Area Genitori</span>
+          </div>
+          <div className="flex gap-4">
+             <div className="w-10 h-10 bg-[#475569] rounded-full flex items-center justify-center hover:bg-brand-pink transition-all cursor-pointer">FB</div>
+             <div className="w-10 h-10 bg-[#475569] rounded-full flex items-center justify-center hover:bg-brand-sky transition-all cursor-pointer">IG</div>
           </div>
         </div>
       </footer>
@@ -351,20 +358,21 @@ export default function App() {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
             className="fixed inset-0 z-[100] bg-white p-8 overflow-hidden"
           >
             <div className="flex justify-between items-center mb-12">
-               <span className="font-black text-2xl">MENU 🌈</span>
-               <button onClick={() => setIsMenuOpen(false)} className="p-3 bg-brand-sky/20 rounded-full"><X /></button>
+               <span className="font-black text-2xl uppercase tracking-tighter">Menu Magico 🌈</span>
+               <button onClick={() => setIsMenuOpen(false)} className="p-3 bg-brand-sky/20 rounded-full hover:rotate-90 transition-transform"><X /></button>
             </div>
-            <div className="flex flex-col gap-8 items-center">
+            <div className="flex flex-col gap-6 items-center">
                {NAV_ITEMS.map((item) => (
                  <button 
                   key={item.name}
-                  className="text-3xl font-black text-slate-800 flex items-center gap-4"
+                  onClick={() => navigateTo(item.name === "Per Genitori" ? "genitori" : item.name)}
+                  className="text-4xl font-black text-slate-800 flex items-center gap-4 active:scale-95 transition-transform"
                  >
                    <item.icon size={32} className={cn(
                      item.color === 'pink' && "text-brand-pink",
@@ -376,6 +384,8 @@ export default function App() {
                    {item.name}
                  </button>
                ))}
+               <hr className="w-full border-slate-100 my-8" />
+               <button onClick={() => navigateTo("home")} className="text-2xl font-bold text-brand-sky italic underline decoration-4 active:scale-95 transition-transform">Torna alla Home</button>
             </div>
           </motion.div>
         )}
@@ -384,7 +394,7 @@ export default function App() {
   );
 }
 
-function ActivityCard({ title, desc, icon: Icon, color }: { title: string, desc: string, icon: any, color: 'pink' | 'sky' | 'orange' | 'mint' }) {
+function ActivityCard({ title, desc, icon: Icon, color, onClick }: { title: string, desc: string, icon: any, color: 'pink' | 'sky' | 'orange' | 'mint', onClick: () => void }) {
   const colors = {
     pink: "bg-brand-pink-bg border-brand-pink hover:border-pink-300 shadow-[0_6px_0_#F472B6]",
     sky: "bg-brand-sky-bg border-brand-sky hover:border-sky-300 shadow-[0_6px_0_#38BDF8]",
@@ -402,6 +412,7 @@ function ActivityCard({ title, desc, icon: Icon, color }: { title: string, desc:
   return (
     <motion.div 
       whileHover={{ y: -10 }}
+      onClick={onClick}
       className={cn(
         "p-8 rounded-[32px] border-b-[6px] transition-all cursor-pointer group text-center bg-white",
         colors[color]
