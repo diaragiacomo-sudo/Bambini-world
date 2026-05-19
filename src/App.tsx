@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   BookOpen, 
@@ -36,9 +36,10 @@ import { cn } from "./lib/utils";
 const NAV_ITEMS = [
   { name: "Fiabe", icon: BookOpen, color: "pink" },
   { name: "Giochi", icon: Gamepad2, color: "sky" },
-  { name: "Creatività", icon: Palette, color: "orange" },
-  { name: "Video", icon: Video, color: "mint" },
-  { name: "Per Genitori", icon: Heart, color: "yellow" },
+  { name: "Musica", icon: Volume2, color: "orange" },
+  { name: "Creatività", icon: Palette, color: "mint" },
+  { name: "Video", icon: Video, color: "yellow" },
+  { name: "Per Genitori", icon: Heart, color: "pink" },
 ];
 
 export default function App() {
@@ -59,6 +60,65 @@ export default function App() {
     setSelectedVideo(null); // Reset video on navigation
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (!isSoundOn) return;
+
+    const greetings: Record<string, string> = {
+      home: "Ciao bambini, come state oggi?",
+      giochi: "A cosa volete giocare oggi?",
+      musica: "Che cosa volete ascoltare oggi?",
+      creatività: "Che cosa volete creare oggi?"
+    };
+
+    const textToSpeak = greetings[activeSection];
+    if (!textToSpeak) return;
+
+    const speak = () => {
+      const msg = new SpeechSynthesisUtterance(textToSpeak);
+      msg.lang = "it-IT";
+      
+      // Cerca una voce italiana (preferibilmente femminile)
+      const voices = window.speechSynthesis.getVoices();
+      const italianVoices = voices.filter(v => v.lang.startsWith('it'));
+      
+      // Spesso le voci con nomi come 'Alice', 'Elsa' o contenenti 'female' sono femminili
+      const femaleVoice = italianVoices.find(v => 
+        v.name.toLowerCase().includes('female') || 
+        v.name.toLowerCase().includes('alice') || 
+        v.name.toLowerCase().includes('elsa') ||
+        v.name.toLowerCase().includes('paola')
+      ) || italianVoices[0];
+      
+      if (femaleVoice) msg.voice = femaleVoice;
+
+      // Tono calmo e rilassato per tutte le sezioni
+      msg.pitch = 1.0;
+      msg.rate = 0.85; // Più lento e calmo
+      
+      // Solo leggermente più vivace per la home, ma comunque lenta
+      if (activeSection === 'home') {
+        msg.pitch = 1.05;
+        msg.rate = 0.9;
+      }
+      
+      // Piccola pausa per lasciare terminare eventuali suoni di transizione
+      setTimeout(() => {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(msg);
+      }, 300);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = speak;
+    } else {
+      speak();
+    }
+    
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, [activeSection, isSoundOn]);
 
   const generateStory = async () => {
     setLoadingStory(true);
@@ -231,8 +291,8 @@ export default function App() {
                 className="rounded-[4rem] overflow-hidden border-8 border-white shadow-2xl relative aspect-[21/9] bg-brand-sky/10"
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1472162072142-d5af1242048e?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Cartoon children playing in the park" 
+                  src="https://images.unsplash.com/photo-1519337020834-263d80a1b7de?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Bambini che giocano al parco" 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -282,22 +342,86 @@ export default function App() {
                     onClick={() => navigateTo("giochi")}
                   />
                   <ActivityCard 
+                    title="Musica e Ballo" 
+                    desc="Canta e balla con le canzoni magiche."
+                    icon={Volume2}
+                    color="orange"
+                    onClick={() => navigateTo("musica")}
+                  />
+                  <ActivityCard 
                     title="Laboratorio" 
                     desc="Impara a disegnare e creare cose bellissime."
                     icon={Palette}
-                    color="orange"
+                    color="mint"
                     onClick={() => navigateTo("creatività")}
                   />
                   <ActivityCard 
                     title="Piccoli Scienziati" 
                     desc="Video brevi per scoprire come funziona il mondo."
                     icon={Video}
-                    color="mint"
+                    color="yellow"
                     onClick={() => navigateTo("video")}
                   />
                 </div>
               </div>
             </main>
+          </motion.div>
+        )}
+
+        {activeSection === "musica" && (
+          <motion.div
+            key="musica"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
+          >
+            <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Canta e Balla! 🎵</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               {[
+                 { t: "Il Ballo dell'Elefante", d: "Una canzone ritmata per saltare tutti insieme!", color: "sky", icon: "🐘", url: "https://www.w3schools.com/html/horse.mp3" },
+                 { t: "La Danza Fatata", d: "Melodia dolce per sognare ad occhi aperti.", color: "pink", icon: "🧚", url: "https://actions.google.com/sounds/v1/science_fiction/stutter_fast.ogg" },
+                 { t: "Avventura nel Bosco", d: "Segui il ritmo della natura e degli animali.", color: "mint", icon: "🦊", url: "https://actions.google.com/sounds/v1/foley/footsteps_on_leaves.ogg" },
+                 { t: "Il Treno dei Sapori", d: "Un viaggio musicale tra frutta e verdura.", color: "orange", icon: "🚂", url: "https://actions.google.com/sounds/v1/transportation/clack_clack_clack_on_creaky_bridge.ogg" },
+                 { t: "Corri Piccolo Drago", d: "Musica energica per i piccoli eroi.", color: "yellow", icon: "🐲", url: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" },
+                 { t: "Sogni D'Oro", d: "Una ninna nanna per rilassarsi prima di dormire.", color: "pink", icon: "🌙", url: "https://actions.google.com/sounds/v1/water/rain_heavy_loud.ogg" },
+               ].map((song, i) => (
+                 <motion.div 
+                   key={i}
+                   whileHover={{ y: -10 }}
+                   className={cn(
+                     "p-8 rounded-[3rem] border-4 bg-white shadow-xl flex flex-col items-center text-center",
+                     song.color === 'sky' && "border-brand-sky",
+                     song.color === 'pink' && "border-brand-pink",
+                     song.color === 'mint' && "border-brand-mint",
+                     song.color === 'orange' && "border-brand-orange",
+                     song.color === 'yellow' && "border-brand-yellow",
+                   )}
+                 >
+                    <div className={cn(
+                      "w-24 h-24 rounded-3xl flex items-center justify-center text-5xl mb-6 shadow-inner",
+                      song.color === 'sky' && "bg-brand-sky/20",
+                      song.color === 'pink' && "bg-brand-pink/20",
+                      song.color === 'mint' && "bg-brand-mint/20",
+                      song.color === 'orange' && "bg-brand-orange/20",
+                      song.color === 'yellow' && "bg-brand-yellow/20",
+                    )}>
+                       {song.icon}
+                    </div>
+                    <h3 className="text-2xl font-black mb-3">{song.t}</h3>
+                    <p className="text-slate-500 text-sm mb-6 font-medium leading-relaxed">{song.d}</p>
+                    <audio 
+                      controls 
+                      src={song.url} 
+                      className="w-full h-10 accent-brand-sky rounded-full"
+                    />
+                 </motion.div>
+               ))}
+            </div>
           </motion.div>
         )}
 
@@ -748,12 +872,13 @@ export default function App() {
   );
 }
 
-function ActivityCard({ title, desc, icon: Icon, color, onClick }: { title: string, desc: string, icon: any, color: 'pink' | 'sky' | 'orange' | 'mint', onClick: () => void }) {
+function ActivityCard({ title, desc, icon: Icon, color, onClick }: { title: string, desc: string, icon: any, color: 'pink' | 'sky' | 'orange' | 'mint' | 'yellow', onClick: () => void }) {
   const colors = {
     pink: "bg-brand-pink-bg border-brand-pink hover:border-pink-300 shadow-[0_6px_0_#F472B6]",
     sky: "bg-brand-sky-bg border-brand-sky hover:border-sky-300 shadow-[0_6px_0_#38BDF8]",
     orange: "bg-brand-orange-bg border-brand-orange hover:border-orange-300 shadow-[0_6px_0_#FB923C]",
     mint: "bg-brand-mint-bg border-brand-mint hover:border-green-300 shadow-[0_6px_0_#4ADE80]",
+    yellow: "bg-brand-yellow/10 border-brand-yellow hover:border-yellow-300 shadow-[0_6px_0_#EAB308]",
   };
 
   const iconColors = {
@@ -761,6 +886,7 @@ function ActivityCard({ title, desc, icon: Icon, color, onClick }: { title: stri
     sky: "bg-[#BAE6FD]",
     orange: "bg-[#FED7AA]",
     mint: "bg-[#BBF7D0]",
+    yellow: "bg-[#FEF08A]",
   };
 
   return (
