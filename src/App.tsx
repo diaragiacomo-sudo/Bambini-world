@@ -27,7 +27,9 @@ import {
 } from "lucide-react";
 import { Mascot } from "./components/Mascot";
 import { MagicButton } from "./components/MagicButton";
+import { MagicChatbot } from "./components/MagicChatbot";
 import { MagicQuiz } from "./components/MagicQuiz";
+import { MagicCanvas } from "./components/MagicCanvas";
 import { Cloud, Star, Rainbow } from "./components/MagicShapes";
 import { cn } from "./lib/utils";
 
@@ -74,8 +76,21 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-b from-[#E0F2FE] to-[#F0F9FF] overflow-x-hidden font-sans">
       {/* Background Shapes */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-10 right-20 w-40 h-16 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-80" />
-        <div className="absolute top-32 left-10 w-24 h-10 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-60" />
+        <motion.div 
+          animate={{ x: [-20, 20, -20] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-10 right-20 w-48 h-20 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-80" 
+        />
+        <motion.div 
+          animate={{ x: [20, -20, 20] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-48 left-10 w-32 h-12 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-60" 
+        />
+        <motion.div 
+          animate={{ x: [-30, 30, -30] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-20 right-1/4 w-40 h-16 bg-white rounded-full shadow-[0_10px_0_#E2E8F0] opacity-40" 
+        />
         <Star className="absolute top-1/4 left-1/3" />
         <Star className="absolute bottom-1/4 right-1/4" delay={1} />
       </div>
@@ -281,22 +296,184 @@ export default function App() {
           </motion.div>
         )}
 
-        {["creatività", "video", "genitori"].includes(activeSection) && (
+        {activeSection === "creatività" && (
           <motion.div
-            key="coming-soon"
+            key="creatività"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
+          >
+            <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Laboratorio Creativo 🎨</h2>
+            </div>
+            <div className="grid grid-cols-1 gap-12">
+               <div>
+                 <h3 className="text-3xl font-black mb-6">Il tuo Studio d'Arte ✨</h3>
+                 <p className="text-lg text-slate-600 mb-8 italic">Prendi i pennelli magici e disegna tutto quello che vuoi!</p>
+                 <MagicCanvas />
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                  <div className="p-8 bg-brand-pink-bg rounded-3xl border-4 border-brand-pink text-center">
+                    <div className="text-5xl mb-4">🌈</div>
+                    <h4 className="font-black text-xl mb-2">Colori Vivi</h4>
+                    <p className="text-slate-500 text-sm">Usa i colori dell'arcobaleno per i tuoi disegni.</p>
+                  </div>
+                  <div className="p-8 bg-brand-sky-bg rounded-3xl border-4 border-brand-sky text-center">
+                    <div className="text-5xl mb-4">✨</div>
+                    <h4 className="font-black text-xl mb-2">Effetti Magici</h4>
+                    <p className="text-slate-500 text-sm">Aggiungi brillantini virtuali ad ogni tratto.</p>
+                  </div>
+                  <div className="p-8 bg-brand-mint-bg rounded-3xl border-4 border-brand-mint text-center">
+                    <div className="text-5xl mb-4">🏆</div>
+                    <h4 className="font-black text-xl mb-2">Mostra d'Arte</h4>
+                    <p className="text-slate-500 text-sm">Pubblica i tuoi lavori nella nostra galleria.</p>
+                  </div>
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeSection === "genitori" && (
+          <motion.div
+            key="genitori"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative z-10 px-6 py-48 text-center"
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
           >
-            <div className="inline-block p-12 bg-white rounded-[4rem] shadow-2xl border-4 border-dashed border-brand-yellow">
-              <div className="text-6xl mb-6">🚀</div>
-              <h2 className="text-4xl font-black mb-4">Lavori in Corso!</h2>
-              <p className="text-xl text-slate-500 mb-8 italic">Stiamo preparando qualcosa di unico...</p>
-              <MagicButton variant="yellow" onClick={() => navigateTo("home")}>Torna alla Home</MagicButton>
+             <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Area Genitori 🛡️</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+               <div className="lg:col-span-2 space-y-8">
+                  <div className="bg-white p-8 rounded-[3rem] shadow-xl border-4 border-slate-100">
+                     <h3 className="text-2xl font-black mb-6 flex items-center gap-2">
+                        <Heart className="text-brand-pink" /> 
+                        Benvenuti Cari Genitori
+                     </h3>
+                     <p className="text-slate-600 leading-relaxed mb-6">
+                        In Piccolo Mondo Magico, la sicurezza è la nostra priorità. Questa dashboard vi permette di gestire l'esperienza digitale dei vostri figli in modo semplice e gratificante.
+                     </p>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-6 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                           <div className="font-bold text-slate-400 text-xs uppercase mb-1">Tempo di Oggi</div>
+                           <div className="text-3xl font-black text-slate-800">45 <span className="text-lg">min</span></div>
+                        </div>
+                        <div className="p-6 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                           <div className="font-bold text-slate-400 text-xs uppercase mb-1">Attività Completate</div>
+                           <div className="text-3xl font-black text-slate-800">12</div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="bg-white p-8 rounded-[3rem] shadow-xl border-4 border-brand-mint/20">
+                     <h3 className="text-2xl font-black mb-6">Consigli Educativi della Settimana</h3>
+                     <div className="space-y-4">
+                        {[
+                          "L'importanza del disegno libero per lo sviluppo motorio.",
+                          "Come discutere le fiabe serali con i propri figli.",
+                          "Sviluppare l'empatia attraverso il gioco cooperativo."
+                        ].map((tip, i) => (
+                          <div key={i} className="flex gap-4 p-4 hover:bg-brand-mint-bg rounded-2xl transition-colors cursor-pointer border-2 border-transparent hover:border-brand-mint">
+                             <div className="text-2xl">💡</div>
+                             <div className="font-medium text-slate-700">{tip}</div>
+                          </div>
+                        ))}
+                     </div>
+                  </div>
+               </div>
+
+               <div className="space-y-8">
+                  <div className="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl">
+                     <h3 className="text-xl font-black mb-6">Sicurezza 🔒</h3>
+                     <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                           <span className="font-bold">Timer Sessione</span>
+                           <div className="w-12 h-6 bg-brand-mint rounded-full relative"><div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"/></div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                           <span className="font-bold">Filtro Contenuti</span>
+                           <div className="w-12 h-6 bg-slate-700 rounded-full relative"><div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"/></div>
+                        </div>
+                        <MagicButton variant="pink" className="w-full text-lg">Modifica Codice PIN</MagicButton>
+                     </div>
+                  </div>
+
+                  <div className="bg-brand-yellow p-8 rounded-[3rem] shadow-xl border-4 border-white">
+                     <h3 className="text-xl font-black text-amber-900 mb-4">Supporto ✨</h3>
+                     <p className="text-amber-800 text-sm font-medium mb-6">Hai bisogno di aiuto per navigare nel sito o configurare i limiti?</p>
+                     <button className="w-full py-3 bg-white rounded-full font-bold text-amber-900 shadow-lg">Contatta Esperti</button>
+                  </div>
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeSection === "video" && (
+          <motion.div
+            key="video"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative z-10 px-6 py-24 max-w-7xl mx-auto"
+          >
+             <div className="mb-12 flex items-center gap-4">
+               <button onClick={() => navigateTo("home")} className="p-4 bg-white rounded-full shadow-md text-2xl hover:scale-110 transition-transform">🏠</button>
+               <h2 className="text-5xl font-black text-slate-800">Video Curiosi 🎥</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               {[
+                 { t: "Come nascono le farfalle?", d: "Vedi la magia della natura!", c: "mint", e: "🦋" },
+                 { t: "Viaggio verso Marte", d: "Esplora lo spazio profondo.", c: "sky", e: "🚀" },
+                 { t: "Il mistero del mare", d: "Scopri i pesci luminosi.", c: "pink", e: "🐠" },
+                 { t: "I segreti del bosco", d: "Ascolta il canto degli alberi.", c: "orange", e: "🌲" },
+                 { t: "Storie di stelle", d: "Impara a riconoscere le costellazioni.", c: "yellow", e: "⭐" },
+                 { t: "Robot amici", d: "Come funzionano le macchine intelligenti.", c: "sky", e: "🤖" },
+               ].map((video, i) => (
+                 <motion.div 
+                   key={i}
+                   whileHover={{ scale: 1.05 }}
+                   className={cn(
+                     "rounded-[2.5rem] overflow-hidden bg-white shadow-xl border-4 group cursor-pointer",
+                     video.c === 'mint' && "border-brand-mint",
+                     video.c === 'sky' && "border-brand-sky",
+                     video.c === 'pink' && "border-brand-pink",
+                     video.c === 'orange' && "border-brand-orange",
+                     video.c === 'yellow' && "border-brand-yellow",
+                   )}
+                 >
+                    <div className={cn(
+                      "h-48 flex items-center justify-center text-7xl relative",
+                      video.c === 'mint' && "bg-brand-mint/20",
+                      video.c === 'sky' && "bg-brand-sky/20",
+                      video.c === 'pink' && "bg-brand-pink/20",
+                      video.c === 'orange' && "bg-brand-orange/20",
+                      video.c === 'yellow' && "bg-brand-yellow/20",
+                    )}>
+                       {video.e}
+                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                             <PlayCircle className="text-slate-800" size={32} />
+                          </div>
+                       </div>
+                    </div>
+                    <div className="p-6">
+                       <h4 className="text-xl font-black mb-2">{video.t}</h4>
+                       <p className="text-slate-500 text-sm font-medium">{video.d}</p>
+                    </div>
+                 </motion.div>
+               ))}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <MagicChatbot />
 
       {/* Parents Section Preview (Solo in Home) */}
       {activeSection === "home" && (
