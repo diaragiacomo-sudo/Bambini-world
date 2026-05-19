@@ -49,17 +49,20 @@ export default function App() {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isMusicOn, setIsMusicOn] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [bgMusic] = useState(new Audio("https://www.singing-bell.com/wp-content/uploads/2015/01/Twinkle-Twinkle-Little-Star-Singing-Bell.mp3"));
+  const [bgMusic] = useState(new Audio("https://www.chosic.com/wp-content/uploads/2021/04/Happy-Clappy-Ukulele.mp3"));
 
   useEffect(() => {
     bgMusic.loop = true;
-    bgMusic.volume = 0.15; // Volume low for background music
+    bgMusic.volume = 0.4; // Increased volume
     if (isMusicOn && hasInteracted) {
-      bgMusic.play().catch(e => console.log("Audio play blocked until user interaction", e));
+      const playPromise = bgMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => console.log("Audio play blocked", e));
+      }
     } else {
       bgMusic.pause();
     }
-  }, [isMusicOn, bgMusic, hasInteracted]);
+  }, [isMusicOn, hasInteracted, bgMusic]);
 
   // Handle first interaction anywhere
   useEffect(() => {
@@ -219,11 +222,14 @@ export default function App() {
       
       if (femaleVoice) msg.voice = femaleVoice;
 
-      msg.onend = () => {
+      const onSpeechEnd = () => {
         if (activeSection === "home" && !isMusicOn) {
           setIsMusicOn(true);
         }
       };
+
+      msg.onend = onSpeechEnd;
+      msg.onerror = onSpeechEnd; // Fallback
 
       msg.pitch = 1.0;
       msg.rate = 0.85; 
@@ -531,12 +537,12 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {[
-                 { t: "Le Ruote del Bus", d: "Girano e girano per tutta la città! Una canzone divertente con le parole.", color: "sky", icon: "🚌", url: "https://www.singing-bell.com/wp-content/uploads/2015/10/The-Wheels-on-the-Bus-Singing-Bell.mp3" },
-                 { t: "Nella Vecchia Fattoria", d: "Quanti animali ci sono? Cantiamo insieme i loro versi!", color: "orange", icon: "🚜", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Old-MacDonald-Had-a-Farm-Singing-Bell.mp3" },
-                 { t: "Se Sei Felice", d: "Batti le mani e canta con noi la gioia di essere amici.", color: "pink", icon: "👏", url: "https://www.singing-bell.com/wp-content/uploads/2015/05/If-Youre-Happy-and-You-Know-It-Singing-Bell.mp3" },
-                 { t: "Incy Wincy Ragnetto", d: "La storia del piccolo ragnetto che sale sulla grondaia.", color: "mint", icon: "🕷️", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Itsy-Bitsy-Spider-Singing-Bell.mp3" },
-                 { t: "Brilla Brilla Stellina", d: "Una dolce canzone per guardare il cielo di notte.", color: "yellow", icon: "⭐", url: "https://www.singing-bell.com/wp-content/uploads/2015/01/Twinkle-Twinkle-Little-Star-Singing-Bell.mp3" },
-                 { t: "Cinque Scimmiette", d: "Saltano sul letto e... oh no! Quante ne restano?", color: "sky", icon: "🐒", url: "https://www.singing-bell.com/wp-content/uploads/2014/12/Five-Little-Monkeys-Singing-Bell.mp3" },
+                 { t: "La Danza del Piccolo Mondo", d: "Una canzone allegra per iniziare la giornata!", color: "sky", icon: "✨", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+                 { t: "Le Ruote del Bus", d: "Girano e girano per tutta la città! Una canzone divertente con le parole.", color: "orange", icon: "🚌", url: "https://www.chosic.com/wp-content/uploads/2021/04/Happy-Clappy-Ukulele.mp3" },
+                 { t: "Brilla Brilla Stellina", d: "Una dolce ninna nanna per sognare ad occhi aperti.", color: "pink", icon: "⭐", url: "https://www.singing-bell.com/wp-content/uploads/2015/01/Twinkle-Twinkle-Little-Star-Singing-Bell.mp3" },
+                 { t: "La Fattoria Felice", d: "Cantiamo insieme i versi degli animali!", color: "mint", icon: "🚜", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Old-MacDonald-Had-a-Farm-Singing-Bell.mp3" },
+                 { t: "Se Sei Felice", d: "Batti le mani se sei felice insieme a noi!", color: "yellow", icon: "👏", url: "https://www.singing-bell.com/wp-content/uploads/2015/05/If-Youre-Happy-and-You-Know-It-Singing-Bell.mp3" },
+                 { t: "Il Ragnetto Incy Wincy", d: "La storia del ragnetto che voleva scalare il mondo.", color: "sky", icon: "🕷️", url: "https://www.singing-bell.com/wp-content/uploads/2014/11/Itsy-Bitsy-Spider-Singing-Bell.mp3" },
                ].map((song, i) => (
                  <motion.div 
                    key={i}
@@ -563,6 +569,7 @@ export default function App() {
                     <h3 className="text-2xl font-black mb-3">{song.t}</h3>
                     <p className="text-slate-500 text-sm mb-6 font-medium leading-relaxed">{song.d}</p>
                     <audio 
+                      onPlay={() => setIsMusicOn(false)}
                       controls 
                       src={song.url} 
                       className="w-full h-10 accent-brand-sky rounded-full"
